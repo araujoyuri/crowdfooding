@@ -19,6 +19,7 @@ class CreateRestaurantDTO(BaseModel):
 	address: str
 	phone: str
 	website: HttpUrl
+	image_url: HttpUrl
 	working_hours: List[WorkingHoursDTO]
 
 
@@ -33,3 +34,7 @@ class CreateRestaurantResponse(BaseModel):
 	created_at: datetime
 	updated_at: datetime
 	deleted_at: Optional[datetime]
+
+
+class UploadRestaurantLogoResponse(BaseModel):
+	image_url: HttpUrl

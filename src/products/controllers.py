@@ -1,9 +1,9 @@
 from typing import List, Any, Union
 from uuid import UUID
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, UploadFile
 
-from .schemas import RestaurantProductsResponse
+from .schemas import RestaurantProductsResponse, UploadProductImageResponse
 from .services import ProductsService
 
 
@@ -24,3 +24,11 @@ async def get_all_products(
 	products_service: ProductsService = Depends(get_products_services),
 ) -> Any:
 	return products_service.get_products_by_restaurant_id(restaurant_id)
+
+
+@products_router.post("/upload-product-image", response_model=UploadProductImageResponse)
+async def upload_profile_image(
+		file: UploadFile,
+		products_service: ProductsService = Depends(get_products_services),
+):
+	return products_service.upload_product_image(await file.read())

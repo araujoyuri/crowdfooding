@@ -1,6 +1,7 @@
 # import logging
 import os
 
+from pydantic import computed_field
 # import structlog
 from pydantic_settings import BaseSettings
 
@@ -10,6 +11,17 @@ class Settings(BaseSettings):
 	DB_PASSWORD: str = os.getenv("DB_PASSWORD", "postgres")
 	DB_NAME: str = os.getenv("DB_NAME", "crowdfooding")
 	PYTHON_ENV: str = os.getenv("PYTHON_ENV", "local")
+	AWS_ACCESS_KEY_ID: str = os.getenv("AWS_ACCESS_KEY_ID")
+	AWS_SECRET_ACCESS_KEY: str = os.getenv("AWS_SECRET_ACCESS_KEY")
+	AWS_REGION: str = os.getenv("AWS_REGION", "eu-east-1")
+	AWS_BUCKET_NAME: str = os.getenv("AWS_BUCKET_NAME", "crowdfooding-app")
+
+	@computed_field(return_type=str)
+	@property
+	def AWS_ENDPOINT_URL(self):
+		if self.PYTHON_ENV == "local":
+			return "http://localhost:4566"
+		return "https://s3.amazonaws.com"
 
 
 settings = Settings()
