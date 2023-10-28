@@ -1,5 +1,12 @@
 # CrowdFooding
 
+![Static Badge](https://img.shields.io/badge/linkedin-Yuri%20Soares-gray?logo=linkedin&labelColor=blue&link=https%3A%2F%2Fwww.linkedin.com%2Fin%2Fyuri-araujo%2F%3Flocale%3Den_US)
+![Static Badge](https://img.shields.io/badge/license-GPL%203.0-orange)
+![Static Badge](https://img.shields.io/badge/python-3.11-blue)
+
+
+
+
 ## Table of Contents
 1. [Introduction](#introduction)
 2. [How It Works](#how-it-works)
