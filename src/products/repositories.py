@@ -1,5 +1,3 @@
-from uuid import UUID
-
 from sqlalchemy.orm import Session, Query
 
 from .models import Product
@@ -11,5 +9,5 @@ class ProductsRepository:
 		self.session = session or SessionLocal()
 		self.query_model = query_model or self.session.query(Product)
 
-	def get_products_by_restaurant_id(self, restaurant_id: UUID):
+	def get_products_by_restaurant_id(self, restaurant_id: str):
 		return self.query_model.filter(Product.restaurant_id == restaurant_id).all()
