@@ -1,0 +1,34 @@
+version: "3.9"
+services:
+  crowdfooding-api:
+    container_name: crowdfooding_api
+    image: araujoyuri/crowdfooding_api
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: local
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - .:/app
+    environment:
+      - .env
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres
+    restart: always
+    container_name: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=app
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=crowdfooding_app
+    ports:
+      - "5432:5432"
+
+volumes:
+  postgres_data:

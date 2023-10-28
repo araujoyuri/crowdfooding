@@ -1,0 +1,38 @@
+[tool.poetry]
+name = "crowdfooding"
+version = "0.1.0"
+description = "Simple API to make food delivery acessible to everyone"
+authors = ["Yuri Araújo <yurisoares3000@gmail.com>"]
+license = "GPL-3.0-or-later"
+readme = "README.md"
+repository = "https://github.com/araujoyuri/crowdfooding"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.104.0"
+uvicorn = {extras = ["standard"], version = "^0.23.2"}
+pydantic = "^2.4.2"
+sqlalchemy = "^2.0.22"
+psycopg = "^3.1.12"
+alembic = "^1.12.1"
+pydantic-settings = "^2.0.3"
+structlog = "^23.2.0"
+python-json-logger = "^2.0.7"
+
+[tool.ruff]
+exclude = [
+    "migrations"
+]
+line-length = 88
+indent-width = 4
+target-version = "py311"
+
+[tool.ruff.format]
+indent-style = "tab"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.1.3"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
