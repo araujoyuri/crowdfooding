@@ -17,12 +17,16 @@ class RestaurantsService:
 	def create_restaurant(self, restaurant: CreateRestaurantDTO):
 		formatted_working_hours = self.format_working_hours(restaurant.working_hours)
 
-		return self.restaurants_repository.save({
-			**restaurant.model_dump(mode="json"),
-			"working_hours": formatted_working_hours
-		})
+		return self.restaurants_repository.save(
+			{
+				**restaurant.model_dump(mode="json"),
+				"working_hours": formatted_working_hours,
+			}
+		)
 
-	def format_working_hours(self, working_hours: List[WorkingHoursDTO]) -> {str: List[dict]}:
+	def format_working_hours(
+		self, working_hours: List[WorkingHoursDTO]
+	) -> {str: List[dict]}:
 		time_ranges = defaultdict(list)
 
 		for working_hour in working_hours:
