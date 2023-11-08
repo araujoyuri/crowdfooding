@@ -1,9 +1,9 @@
-from typing import List, Any, Union
+from typing import Annotated
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, UploadFile
 
-from .schemas import RestaurantProductsResponse, UploadProductImageResponse
+from .schemas import UploadProductImageResponse, CreateProductDTO
 from .services import ProductsService
 
 
@@ -16,19 +16,27 @@ def get_products_services():
 	return ProductsService()
 
 
-@products_router.get(
-	"/{restaurant_id}", response_model=Union[List[RestaurantProductsResponse], None]
+ProductsServiceDep = Annotated[ProductsService, Depends(get_products_services)]
+
+
+@products_router.post(
+	"/upload-product-image", response_model=UploadProductImageResponse, status_code=201
 )
-async def get_all_products(
-	restaurant_id: UUID,
-	products_service: ProductsService = Depends(get_products_services),
-) -> Any:
-	return products_service.get_products_by_restaurant_id(restaurant_id)
-
-
-@products_router.post("/upload-product-image", response_model=UploadProductImageResponse)
 async def upload_profile_image(
-		file: UploadFile,
-		products_service: ProductsService = Depends(get_products_services),
+	file: UploadFile,
+	products_service: ProductsServiceDep,
 ):
 	return products_service.upload_product_image(await file.read())
+
+
+@products_router.post(
+	"/{restaurant_id}", response_model=CreateProductDTO, status_code=201
+)
+async def create_product(
+	restaurant_id: UUID,
+	product: CreateProductDTO,
+	products_service: ProductsServiceDep,
+):
+	return products_service.create_product(
+		restaurant_id, product.model_dump(mode="json")
+	)

@@ -17,3 +17,10 @@ class ProductsRepository:
 
 	def get_active_product_by_id(self, product_id: UUID) -> Product | None:
 		return self.query_model.filter_by(id=product_id, active=True).first()
+
+	def create_product(self, product: dict) -> Product:
+		product = Product(**product)
+		self.session.add(product)
+		self.session.commit()
+
+		return product

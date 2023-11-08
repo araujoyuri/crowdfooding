@@ -2,6 +2,7 @@ from uuid import UUID, uuid4
 
 import boto3
 
+from .models import Product
 from .repositories import ProductsRepository
 from ..config import settings
 from ..restaurants.errors import RestaurantNotFoundError
@@ -10,10 +11,10 @@ from ..restaurants.services import RestaurantsService
 
 class ProductsService:
 	def __init__(
-			self,
-			products_repository: ProductsRepository = None,
-			restaurant_service: RestaurantsService = None,
-			file_storage=None,
+		self,
+		products_repository: ProductsRepository = None,
+		restaurant_service: RestaurantsService = None,
+		file_storage=None,
 	):
 		self.products_repository = products_repository or ProductsRepository()
 		self.restaurants_service = restaurant_service or RestaurantsService()
@@ -26,10 +27,21 @@ class ProductsService:
 		)
 		self.bucket = self.file_storage.Bucket(settings.AWS_BUCKET_NAME)
 
+	def create_product(self, restaurant_id: UUID, product: dict) -> Product:
+		restaurant = self.restaurants_service.get_active_restaurant_by_id(restaurant_id)
+
+		if restaurant:
+			return self.products_repository.create_product(
+				{
+					**product,
+					"restaurant_id": restaurant_id.hex,
+				}
+			)
+		else:
+			raise RestaurantNotFoundError(restaurant_id=restaurant_id.hex)
+
 	def get_products_by_restaurant_id(self, restaurant_id: UUID):
-		restaurant = self.restaurants_service.get_active_restaurant_by_id(
-			restaurant_id.hex
-		)
+		restaurant = self.restaurants_service.get_active_restaurant_by_id(restaurant_id)
 
 		if restaurant:
 			return self.products_repository.get_products_by_restaurant_id(
@@ -47,4 +59,6 @@ class ProductsService:
 			Body=image,
 		)
 
-		return {"image_url": f"{settings.AWS_ENDPOINT_URL}/{settings.AWS_BUCKET_NAME}/{object_key}"}
+		return {
+			"image_url": f"{settings.AWS_ENDPOINT_URL}/{settings.AWS_BUCKET_NAME}/{object_key}"
+		}

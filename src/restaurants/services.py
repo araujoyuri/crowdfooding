@@ -1,19 +1,20 @@
 from collections import defaultdict
 from datetime import time
 from typing import List
-from uuid import uuid4
+from uuid import uuid4, UUID
 
 import boto3
 
-from .errors import WorkingHoursValidationError
+from .errors import WorkingHoursValidationError, RestaurantNotFoundError
 from .repositories import RestaurantsRepository
 from .schemas import CreateRestaurantDTO, WorkingHoursDTO
 from ..config import settings
+from ..products.models import Product
 
 
 class RestaurantsService:
 	def __init__(
-			self, restaurants_repository: RestaurantsRepository = None, file_storage=None
+		self, restaurants_repository: RestaurantsRepository = None, file_storage=None
 	):
 		self.restaurants_repository = restaurants_repository or RestaurantsRepository()
 		self.file_storage = file_storage or boto3.resource(
@@ -25,8 +26,18 @@ class RestaurantsService:
 		)
 		self.bucket = self.file_storage.Bucket(settings.AWS_BUCKET_NAME)
 
-	def get_active_restaurant_by_id(self, restaurant_id):
+	def get_active_restaurant_by_id(self, restaurant_id: UUID):
 		return self.restaurants_repository.get_active_restaurant_by_id(restaurant_id)
+
+	def get_products_from_restaurant(self, restaurant_id: UUID) -> List[Product]:
+		restaurant = self.restaurants_repository.get_active_restaurant_by_id(
+			restaurant_id
+		)
+
+		if restaurant:
+			return restaurant.products
+		else:
+			RestaurantNotFoundError(restaurant_id=restaurant_id.hex)
 
 	def create_restaurant(self, restaurant: CreateRestaurantDTO):
 		formatted_working_hours = self.format_working_hours(restaurant.working_hours)
@@ -39,7 +50,7 @@ class RestaurantsService:
 		)
 
 	def format_working_hours(
-			self, working_hours: List[WorkingHoursDTO]
+		self, working_hours: List[WorkingHoursDTO]
 	) -> {str: List[dict]}:
 		time_ranges = defaultdict(list)
 
@@ -59,7 +70,7 @@ class RestaurantsService:
 				overlapping = False
 				for existing_range in time_ranges[day]:
 					if (start_time < time.fromisoformat(existing_range["close"])) and (
-							end_time > time.fromisoformat(existing_range["open"])
+						end_time > time.fromisoformat(existing_range["open"])
 					):
 						overlapping = True
 						break
@@ -85,4 +96,6 @@ class RestaurantsService:
 			Body=image,
 		)
 
-		return {"image_url": f"{settings.AWS_ENDPOINT_URL}/{settings.AWS_BUCKET_NAME}/{object_key}"}
+		return {
+			"image_url": f"{settings.AWS_ENDPOINT_URL}/{settings.AWS_BUCKET_NAME}/{object_key}"
+		}
