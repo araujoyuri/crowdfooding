@@ -37,8 +37,7 @@ class ProductsService:
 					"restaurant_id": restaurant_id.hex,
 				}
 			)
-		else:
-			raise RestaurantNotFoundError(restaurant_id=restaurant_id.hex)
+		raise RestaurantNotFoundError(restaurant_id=restaurant_id.hex)
 
 	def get_products_by_restaurant_id(self, restaurant_id: UUID):
 		restaurant = self.restaurants_service.get_active_restaurant_by_id(restaurant_id)
@@ -47,8 +46,7 @@ class ProductsService:
 			return self.products_repository.get_products_by_restaurant_id(
 				restaurant_id.hex
 			)
-		else:
-			raise RestaurantNotFoundError(restaurant_id=restaurant_id.hex)
+		raise RestaurantNotFoundError(restaurant_id=restaurant_id.hex)
 
 	def upload_product_image(self, image: bytes) -> dict[str, str]:
 		object_key = "products/{}.jpg".format(uuid4())

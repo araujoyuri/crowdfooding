@@ -36,8 +36,8 @@ class RestaurantsService:
 
 		if restaurant:
 			return restaurant.products
-		else:
-			RestaurantNotFoundError(restaurant_id=restaurant_id.hex)
+			
+		raise RestaurantNotFoundError(restaurant_id=restaurant_id.hex)
 
 	def create_restaurant(self, restaurant: CreateRestaurantDTO):
 		formatted_working_hours = self.format_working_hours(restaurant.working_hours)
